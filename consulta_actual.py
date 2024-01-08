@@ -1,4 +1,5 @@
 import json
+import pandas as pd
 import spotipy
 from spotipy.oauth2 import SpotifyClientCredentials
 
@@ -70,3 +71,15 @@ for album in albums['items']:
 
 with open('consulta_actual.json', 'w') as json_file:
     json.dump(complete_info, json_file, indent=4)
+
+# Asignamos el contenido del archivo .json a la variable data
+with open('consulta_actual.json', 'r') as file:
+    data = json.load(file)
+
+# Usamos los parámetros "record_path" para acceder a la información anidada
+# y "meta" para las demas columnas que queremos extraer.
+df1 = pd.json_normalize(data=data, record_path=['albums', 'tracks'], 
+                        meta=[['albums', 'id'], ['albums', 'name'],
+                             ['albums', 'release_date']])
+
+df1.to_csv('consulta_actual.csv', index=False)
